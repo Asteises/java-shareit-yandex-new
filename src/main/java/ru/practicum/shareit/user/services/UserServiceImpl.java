@@ -43,24 +43,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto put(UserDto userDto, long userId) throws UserNotFound {
-        if (userDto != null && userStorage.findById(userId) != null) {
-            User checkUser =
-                    userStorage.findAll().stream()
-                            .filter(user -> user.getEmail().equals(userDto.getEmail()))
-                            .findFirst()
-                            .orElse(null);
-            if (checkUser == null) {
+        if (userDto != null) {
+            if (userStorage.findAll().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
                 User user = userStorage.findById(userId);
-                user.setId(userId);
-                if (userDto.getName() != null) {
-                    user.setName(userDto.getName());
-                }
-                if (userDto.getEmail() != null) {
+                if (user != null) {
+                    user.setId(userId);
+                    if (userDto.getName() != null) {
+                        user.setName(userDto.getName());
+                    }
+                    if (userDto.getEmail() != null) {
 
-                    user.setEmail(userDto.getEmail());
+                        user.setEmail(userDto.getEmail());
+                    }
+                    userStorage.put(user, userId);
+                    return UserMapper.toUserDto(user);
+                } else {
+                    throw new IllegalArgumentException("Duplicated email");
                 }
-                userStorage.put(user, userId);
-                return UserMapper.toUserDto(user);
             } else {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -71,9 +70,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long userId) throws UserNotFound {
-        if (userStorage.findById(userId) != null) {
+        try {
             userStorage.delete(userId);
-        } else {
+        } catch (UserNotFound e) {
             throw new UserNotFound(String.format("User %s not found", userId));
         }
     }

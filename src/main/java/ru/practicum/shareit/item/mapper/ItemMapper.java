@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -14,8 +15,8 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
-//                item.getRequest() != null ? item.getRequest().getId() : null
+                item.getAvailable(),
+                item.getRequest() != null ? item.getRequest().getId() : 0
         );
     }
 
@@ -24,6 +25,7 @@ public class ItemMapper {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
+        item.setRequest(new ItemRequest());
         return item;
     }
 }

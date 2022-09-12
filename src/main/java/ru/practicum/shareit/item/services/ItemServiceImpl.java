@@ -27,8 +27,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto save(ItemDto itemDto, long userId) throws UserNotFound {
-        if (userStorage.findById(userId) != null) {
-            User user = userStorage.findById(userId);
+        User user = userStorage.findById(userId);
+        if (user != null) {
             Item item = ItemMapper.toItem(itemDto);
             if (item.getAvailable() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -41,7 +41,8 @@ public class ItemServiceImpl implements ItemService {
             }
             item.setId(++itemId);
             item.setOwner(user);
-            return itemStorage.save(item);
+            itemStorage.save(item);
+            return ItemMapper.toItemDto(item);
         } else {
             throw new UserNotFound(String.format("User %s not found", userId));
         }
@@ -87,7 +88,8 @@ public class ItemServiceImpl implements ItemService {
                         item.getId(),
                         item.getName(),
                         item.getDescription(),
-                        item.getAvailable())).collect(Collectors.toList());
+                        item.getAvailable(),
+                        item.getRequest().getId())).collect(Collectors.toList());
     }
 
     @Override
@@ -102,11 +104,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> findAllByUserId(long userId) throws UserNotFound {
         try {
-            return itemStorage.findAllByUserId(userId).stream().map(item -> new ItemDto(
-                    item.getId(),
-                    item.getName(),
-                    item.getDescription(),
-                    item.getAvailable())).collect(Collectors.toList());
+            return itemStorage.findAllByUserId(userId).stream()
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
         } catch (UserNotFound e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -114,10 +114,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAllByItemName(String text) {
-        return itemStorage.findAllByItemName(text).stream().map(item -> new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable())).collect(Collectors.toList());
+        return itemStorage.findAllByItemName(text).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.repositores;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.model.Item;
 
@@ -10,9 +9,9 @@ import java.util.List;
 @Repository
 public interface ItemStorage {
 
-    ItemDto save(Item item);
+    Item save(Item item);
 
-    ItemDto put(Item item, long itemId) throws ItemNotFound;
+    Item put(Item item, long itemId) throws ItemNotFound;
 
     void delete(long itemId) throws ItemNotFound;
 

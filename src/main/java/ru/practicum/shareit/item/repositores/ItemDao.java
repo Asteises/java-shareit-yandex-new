@@ -2,9 +2,7 @@ package ru.practicum.shareit.item.repositores;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
 
@@ -21,15 +19,15 @@ public class ItemDao implements ItemStorage {
     private final Map<Long, Item> items = new HashMap<>();
 
     @Override
-    public ItemDto save(Item item) {
+    public Item save(Item item) {
         items.put(item.getId(), item);
-        return ItemMapper.toItemDto(item);
+        return item;
     }
 
     @Override
-    public ItemDto put(Item item, long itemId) throws ItemNotFound {
+    public Item put(Item item, long itemId) throws ItemNotFound {
         items.replace(itemId, item);
-        return ItemMapper.toItemDto(item);
+        return item;
     }
 
     @Override
@@ -57,12 +55,13 @@ public class ItemDao implements ItemStorage {
     @Override
     public List<Item> findAllByItemName(String text) {
         List<Item> findItems = new ArrayList<>();
-        if (text != null && !text.isEmpty()) {
-            findItems.addAll(items.values().stream()
-                    .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase()))
-                            || (item.getDescription().toLowerCase().contains(text.toLowerCase())))
+        String checkText = text.toLowerCase();
+        if (!checkText.isEmpty()) {
+            return items.values().stream()
+                    .filter(item -> (item.getName().toLowerCase().contains(checkText))
+                            || (item.getDescription().toLowerCase().contains(checkText)))
                     .filter(Item::getAvailable)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
         return findItems;
     }
