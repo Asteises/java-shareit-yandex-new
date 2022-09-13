@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
+import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
@@ -29,22 +28,22 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto save(ItemDto itemDto, long userId) throws UserNotFound {
         User user = userStorage.findById(userId);
         if (user != null) {
-            Item item = ItemMapper.toItem(itemDto);
+            Item item = ItemMapper.toItem(itemDto, user, null);
             if (item.getAvailable() == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                throw new ItemNullParametr(String.format("Available not exist - %s", item.getAvailable()));
             }
             if (item.getName() == null || item.getName().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                throw new ItemNullParametr(String.format("Name not exist - %s", item.getName()));
             }
             if (item.getDescription() == null || item.getDescription().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
             }
             item.setId(++itemId);
             item.setOwner(user);
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);
         } else {
-            throw new UserNotFound(String.format("User %s not found", userId));
+            throw new UserNotFound("User %s not found", userId);
         }
     }
 
@@ -65,31 +64,25 @@ public class ItemServiceImpl implements ItemService {
                 itemStorage.put(item, itemId);
                 return ItemMapper.toItemDto(item);
             } else {
-                throw new UserNotFound(String.format("User %s not found", userId));
+                throw new UserNotFound("User %s not found", userId);
             }
         } catch (ItemNotFound e) {
-            throw new ItemNotFound(String.format("Item %s not found", itemId));
+            throw new ItemNotFound("Item %s not found", itemId);
         }
     }
 
     @Override
     public void delete(long itemId) throws ItemNotFound {
-        try {
-            itemStorage.delete(itemId);
-        } catch (ItemNotFound e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        if (!itemStorage.findAll().removeIf(item -> item.getId() == itemId)) {
+            throw new ItemNotFound("Item %s not found", itemId);
         }
     }
 
     @Override
     public List<ItemDto> findAll() {
         return itemStorage.findAll().stream()
-                .map(item -> new ItemDto(
-                        item.getId(),
-                        item.getName(),
-                        item.getDescription(),
-                        item.getAvailable(),
-                        item.getRequest().getId())).collect(Collectors.toList());
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -97,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             return ItemMapper.toItemDto(itemStorage.findById(itemId));
         } catch (ItemNotFound e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ItemNotFound("Item %s not found", itemId);
         }
     }
 
@@ -108,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
         } catch (UserNotFound e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new UserNotFound("User %s not found", userId);
         }
     }
 

@@ -1,11 +1,12 @@
 package ru.practicum.shareit.user.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.UserDtoBadRequest;
+import ru.practicum.shareit.user.exceptions.UserDuplicatedEmail;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
+import ru.practicum.shareit.user.exceptions.UserServerError;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
@@ -34,10 +35,10 @@ public class UserServiceImpl implements UserService {
                 user.setId(++userID);
                 return UserMapper.toUserDto(userStorage.save(user));
             } else {
-                throw new RuntimeException("Duplicated email");
+                throw new UserDuplicatedEmail("Duplicated email %s", userDto.getEmail());
             }
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new UserDtoBadRequest("Bad request for userDto", userDto);
         }
     }
 
@@ -52,19 +53,18 @@ public class UserServiceImpl implements UserService {
                         user.setName(userDto.getName());
                     }
                     if (userDto.getEmail() != null) {
-
                         user.setEmail(userDto.getEmail());
                     }
                     userStorage.put(user, userId);
                     return UserMapper.toUserDto(user);
                 } else {
-                    throw new IllegalArgumentException("Duplicated email");
+                    throw new UserDuplicatedEmail("Duplicated email %s", userDto.getEmail());
                 }
             } else {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new UserServerError("User already exist");
             }
         } else {
-            throw new UserNotFound(String.format("User %s not found", userId));
+            throw new UserNotFound("User %s not found", userId);
         }
     }
 
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         try {
             userStorage.delete(userId);
         } catch (UserNotFound e) {
-            throw new UserNotFound(String.format("User %s not found", userId));
+            throw new UserNotFound("User %s not found", userId);
         }
     }
 
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
         try {
             return UserMapper.toUserDto(userStorage.findById(userId));
         } catch (UserNotFound e) {
-            throw new UserNotFound(String.format("User %s not found", userId));
+            throw new UserNotFound("User %s not found", userId);
         }
     }
 }
