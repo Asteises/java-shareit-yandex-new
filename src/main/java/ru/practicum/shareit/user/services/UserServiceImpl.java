@@ -71,8 +71,7 @@ public class UserServiceImpl implements UserService {
     public void delete(long userId) throws UserNotFound {
         Optional<User> optionalUser = userStorage.findById(userId);
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            userStorage.delete(user);
+            userStorage.delete(optionalUser.get());
         } else  {
             throw new UserNotFound("User %s not found", userId);
         }
