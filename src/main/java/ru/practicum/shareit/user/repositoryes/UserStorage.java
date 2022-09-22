@@ -1,21 +1,10 @@
 package ru.practicum.shareit.user.repositoryes;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
-
 @Repository
-public interface UserStorage {
+public interface UserStorage extends JpaRepository<User, Long> {
 
-    User save(User user);
-
-    User put(User user, long userId) throws UserNotFound;
-
-    void delete(long userId) throws UserNotFound;
-
-    List<User> findAll();
-
-    User findById(long userId) throws UserNotFound;
 }

@@ -3,35 +3,36 @@ package ru.practicum.shareit.user.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor // Пустой конструктор - обязательное условие для Entity
 @Entity
-@Table(name = "USERS", schema = "public")
+@Table(name = "USERS", schema = "schema")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Column(name = "FIRST_NAME", nullable = false, length = 255)
-    private String firstName;
-
-    @Column(name = "LAST_NAME", length = 255)
-    private String lastName;
+    @Column(name = "NAME", nullable = false, length = 255)
+    private String name;
 
     @NotNull
     @NotBlank
     @Column(name = "EMAIL")
     private String email;
 
-    @Column(name = "REGISTRATION_DATE")
-    private Instant registrationDate = Instant.now();
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Item> items = new ArrayList<>();
 
 }

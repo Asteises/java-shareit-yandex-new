@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,8 +47,9 @@ public class UserServiceImpl implements UserService {
     public UserDto put(UserDto userDto, long userId) throws UserNotFound {
         if (userDto != null) {
             if (userStorage.findAll().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
-                User user = userStorage.findById(userId);
-                if (user != null) {
+                Optional<User> optionalUser = userStorage.findById(userId);
+                if (optionalUser.isPresent()) {
+                    User user = optionalUser.get();
                     user.setId(userId);
                     if (userDto.getName() != null) {
                         user.setName(userDto.getName());
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService {
                     if (userDto.getEmail() != null) {
                         user.setEmail(userDto.getEmail());
                     }
-                    userStorage.put(user, userId);
+                    userStorage.save(user);
                     return UserMapper.toUserDto(user);
                 } else {
                     throw new UserDuplicatedEmail("Duplicated email %s", userDto.getEmail());
@@ -70,9 +72,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long userId) throws UserNotFound {
-        try {
-            userStorage.delete(userId);
-        } catch (UserNotFound e) {
+        Optional<User> optionalUser = userStorage.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            userStorage.delete(user);
+        } else  {
             throw new UserNotFound("User %s not found", userId);
         }
     }
@@ -86,9 +90,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findById(long userId) throws UserNotFound {
-        try {
-            return UserMapper.toUserDto(userStorage.findById(userId));
-        } catch (UserNotFound e) {
+        Optional<User> optionalUser = userStorage.findById(userId);
+        if (optionalUser.isPresent()) {
+            return UserMapper.toUserDto(optionalUser.get());
+        } else {
             throw new UserNotFound("User %s not found", userId);
         }
     }

@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +27,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto save(ItemDto itemDto, long userId) throws UserNotFound {
-        User user = userStorage.findById(userId);
-        if (user != null) {
-            Item item = ItemMapper.toItem(itemDto, user, null);
+        Optional<User> optionalUser = userStorage.findById(userId);
+        if (optionalUser.isPresent()) {
+            Item item = ItemMapper.toItem(itemDto, optionalUser.get(), null);
             if (item.getAvailable() == null) {
                 throw new ItemNullParametr(String.format("Available not exist - %s", item.getAvailable()));
             }
@@ -39,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
                 throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
             }
             item.setId(++itemId);
-            item.setOwner(user);
+            item.setOwner(optionalUser.get());
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);
         } else {
@@ -49,8 +50,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto put(ItemDto itemDto, long itemId, long userId) throws ItemNotFound, UserNotFound {
-        try {
-            Item item = itemStorage.findById(itemId);
+        Optional<Item> optionalItem = itemStorage.findById(itemId);
+        if (optionalItem.isPresent()) {
+            Item item = optionalItem.get();
             if (item.getOwner() != null && item.getOwner().getId().equals(userId)) {
                 if (itemDto.getAvailable() != null) {
                     item.setAvailable(itemDto.getAvailable());
@@ -61,12 +63,12 @@ public class ItemServiceImpl implements ItemService {
                 if (itemDto.getDescription() != null) {
                     item.setDescription(itemDto.getDescription());
                 }
-                itemStorage.put(item, itemId);
+                itemStorage.save(item);
                 return ItemMapper.toItemDto(item);
             } else {
                 throw new UserNotFound("User %s not found", userId);
             }
-        } catch (ItemNotFound e) {
+        } else {
             throw new ItemNotFound("Item %s not found", itemId);
         }
     }
@@ -87,27 +89,29 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto findById(long itemId) throws ItemNotFound {
-        try {
-            return ItemMapper.toItemDto(itemStorage.findById(itemId));
-        } catch (ItemNotFound e) {
+        Optional<Item> optionalItem = itemStorage.findById(itemId);
+        if (optionalItem.isPresent()) {
+            return ItemMapper.toItemDto(optionalItem.get());
+        } else {
             throw new ItemNotFound("Item %s not found", itemId);
         }
     }
 
     @Override
     public List<ItemDto> findAllByUserId(long userId) throws UserNotFound {
-        try {
-            return itemStorage.findAllByUserId(userId).stream()
+        Optional<User> optionalUser = userStorage.findById(userId);
+        if (optionalUser.isPresent()) {
+            return itemStorage.findAllByOwnerId(userId).stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
-        } catch (UserNotFound e) {
+        } else {
             throw new UserNotFound("User %s not found", userId);
         }
     }
 
     @Override
     public List<ItemDto> findAllByItemName(String text) {
-        return itemStorage.findAllByItemName(text).stream()
+        return itemStorage.findAllByName(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
