@@ -33,8 +33,8 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto put(@RequestBody UserDto userDto, @PathVariable long userId) throws UserNotFound {
-        return userService.put(userDto, userId);
+    public UserDto patch(@RequestBody UserDto userDto, @PathVariable long userId) throws UserNotFound {
+        return userService.patch(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")

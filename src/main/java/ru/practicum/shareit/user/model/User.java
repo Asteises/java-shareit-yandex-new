@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor // Пустой конструктор - обязательное условие для Entity
 @Entity
-@Table(name = "USERS", schema = "schema")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -31,8 +31,5 @@ public class User {
     @NotBlank
     @Column(name = "EMAIL")
     private String email;
-
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<Item> items = new ArrayList<>();
 
 }

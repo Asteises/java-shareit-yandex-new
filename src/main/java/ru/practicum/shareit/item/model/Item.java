@@ -33,6 +33,6 @@ public class Item {
     private User owner;
 
     @ManyToOne(fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
-    @JoinColumn(name = "OWNER_ID")
+    @JoinColumn(name = "REQUEST_ID")
     private ItemRequest request;
 }

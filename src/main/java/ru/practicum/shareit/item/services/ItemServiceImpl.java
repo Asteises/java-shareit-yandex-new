@@ -23,8 +23,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage; // Если стоит final для неинициализированного поля то конструктор нужен обязательно
     private final UserStorage userStorage;
 
-    private long itemId = 0;
-
     @Override
     public ItemDto save(ItemDto itemDto, long userId) throws UserNotFound {
         Optional<User> optionalUser = userStorage.findById(userId);
@@ -39,7 +37,6 @@ public class ItemServiceImpl implements ItemService {
             if (item.getDescription() == null || item.getDescription().isEmpty()) {
                 throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
             }
-            item.setId(++itemId);
             item.setOwner(optionalUser.get());
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);

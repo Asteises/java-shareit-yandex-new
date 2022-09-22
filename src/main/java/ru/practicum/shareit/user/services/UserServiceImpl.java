@@ -21,8 +21,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
-    private long userID = 0;
-
     @Override
     public UserDto save(UserDto userDto) {
         if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
@@ -33,7 +31,6 @@ public class UserServiceImpl implements UserService {
                             .orElse(null);
             if (checkUser == null) {
                 User user = UserMapper.toUser(userDto);
-                user.setId(++userID);
                 return UserMapper.toUserDto(userStorage.save(user));
             } else {
                 throw new UserDuplicatedEmail("Duplicated email %s", userDto.getEmail());
@@ -44,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto put(UserDto userDto, long userId) throws UserNotFound {
+    public UserDto patch(UserDto userDto, long userId) throws UserNotFound {
         if (userDto != null) {
             if (userStorage.findAll().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
                 Optional<User> optionalUser = userStorage.findById(userId);

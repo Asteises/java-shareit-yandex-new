@@ -11,7 +11,7 @@ public interface UserService {
 
     UserDto save(UserDto userDto);
 
-    UserDto put(UserDto userDto, long userId) throws UserNotFound;
+    UserDto patch(UserDto userDto, long userId) throws UserNotFound;
 
     void delete(long userId) throws UserNotFound;
 
