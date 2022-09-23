@@ -4,17 +4,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.booking.exception.BookingNotFound;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.user.exceptions.UserDtoBadRequest;
 import ru.practicum.shareit.user.exceptions.UserDuplicatedEmail;
+import ru.practicum.shareit.user.exceptions.UserNotBooker;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
+import ru.practicum.shareit.user.exceptions.UserNotOwner;
 import ru.practicum.shareit.user.exceptions.UserServerError;
 
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler({UserNotFound.class, ItemNotFound.class})
+    @ExceptionHandler({UserNotFound.class, ItemNotFound.class, BookingNotFound.class})
     public ResponseEntity<String> userNotFoundHandler(final RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Something not found");
     }
@@ -37,5 +40,15 @@ public class ErrorHandler {
     @ExceptionHandler({UserServerError.class})
     public ResponseEntity<String> userServerError(final RuntimeException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Bad request or null for User");
+    }
+
+    @ExceptionHandler({UserNotOwner.class})
+    public ResponseEntity<String> wrongOwner(final RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Owner for this Item");
+    }
+
+    @ExceptionHandler({UserNotBooker.class})
+    public ResponseEntity<String> wrongBooker(final RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not Booker for this Item");
     }
 }
