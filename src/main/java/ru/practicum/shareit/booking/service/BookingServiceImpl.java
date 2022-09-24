@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.exception.BookingNotFound;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repositoty.BookingStorage;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingRepository bookingRepository;
+    private final BookingStorage bookingRepository;
     private final UserStorage userStorage;
     private final ItemStorage itemStorage;
 
@@ -110,21 +111,62 @@ public class BookingServiceImpl implements BookingService {
             }
             if (state.equals("CURRENT")) {
                 return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.APPROVED).stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("PAST")) {
                 return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.CANCELED).stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("WAITING")) {
                 return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.WAITING).stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("REJECTED")) {
                 return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.REJECTED).stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            }
+        } else {
+            throw new UserNotFound("User not found", userId);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<BookingDto> getAllBookingsByOwner(String state, long userId) throws UserNotFound {
+        Optional<User> optionalUser = userStorage.findById(userId);
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (state.equals("ALL")) {
+                return bookingRepository.findAllByItemOwner(userId).stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            }
+            if (state.equals("CURRENT")) {
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.APPROVED).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            }
+            if (state.equals("PAST")) {
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.CANCELED).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            }
+            if (state.equals("WAITING")) {
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.WAITING).stream()
+                        .map(BookingMapper::toBookingDto)
+                        .collect(Collectors.toList());
+            }
+            if (state.equals("REJECTED")) {
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.REJECTED).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }

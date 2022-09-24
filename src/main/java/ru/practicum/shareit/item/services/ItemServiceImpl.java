@@ -37,7 +37,6 @@ public class ItemServiceImpl implements ItemService {
             if (item.getDescription() == null || item.getDescription().isEmpty()) {
                 throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
             }
-            item.setOwner(optionalUser.get());
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);
         } else {

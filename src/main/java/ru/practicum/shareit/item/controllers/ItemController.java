@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.Comment;
+import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.services.ItemService;
@@ -16,6 +18,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
+    private final CommentService commentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -54,5 +57,13 @@ public class ItemController {
     @ResponseStatus(HttpStatus.OK)
     public List<ItemDto> findAllByItemName(@RequestParam String text) {
         return itemService.findAllByItemName(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Comment postComment(@PathVariable long itemId,
+                               @RequestHeader("X-Sharer-User-Id") long userId,
+                               @RequestParam String text) {
+        return commentService.postComment(itemId, userId, text);
     }
 }

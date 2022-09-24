@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.BookingNotFound;
 import ru.practicum.shareit.user.exceptions.UserNotBooker;
@@ -62,8 +62,15 @@ public class BookingController {
      */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingDto> getAllBookingsByBooker(@RequestParam(defaultValue = "ALL")String state,
+    public List<BookingDto> getAllBookingsByBooker(@RequestParam(defaultValue = "ALL") String state,
                                                   @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
         return bookingService.getAllBookingsByBooker(state, userId);
+    }
+
+    @GetMapping("/owner")
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookingDto> getAllBookingsByOwner(@RequestParam(defaultValue = "ALL") String state,
+                                                  @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
+        return bookingService.getAllBookingsByOwner(state, userId);
     }
 }

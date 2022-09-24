@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -23,4 +23,6 @@ public interface BookingService {
             throws BookingNotFound, UserNotFound, UserNotOwner, UserNotBooker;
 
     List<BookingDto> getAllBookingsByBooker(String state, long userId) throws UserNotFound;
+
+    List<BookingDto> getAllBookingsByOwner(String state, long userId) throws UserNotFound;
 }
