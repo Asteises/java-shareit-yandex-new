@@ -24,7 +24,7 @@ public class CommentServiceImpl implements CommentService {
     private final BookingStorage bookingStorage;
 
     @Override
-    public Comment postComment(long itemId, long userId, String text)
+    public CommentDto postComment(long itemId, long userId, String text)
             throws ItemNotFound, UserNotFound, UserNotBooker {
         Optional<User> optionalUser = userStorage.findById(userId);
         if (optionalUser.isPresent()) {
@@ -38,7 +38,8 @@ public class CommentServiceImpl implements CommentService {
                     comment.setAuthor(user);
                     comment.setItem(item);
                     comment.setText(text);
-                    return commentStorage.save(comment);
+                    commentStorage.save(comment);
+                    return CommentMapper.toCommentDto(comment);
                 } else {
                     throw new UserNotBooker("This User not Booker for this Item", userId);
                 }
