@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
         if (optionalBooking.isPresent()) {
             Booking booking = optionalBooking.get();
-            if (booking.getItem().getOwner().getId() == userId) {
+            if (booking.getItem().getOwner().getId().equals(userId)) {
                 if (isApproved) {
                     booking.setStatus(BookingStatus.APPROVED);
                 } else {
@@ -77,6 +77,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getBooking(long bookingId, long userId)
             throws BookingNotFound, UserNotFound, UserNotOwner, UserNotBooker {
 
+        //TODO Попробовать сделать все это через классы валиадации
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
 
         if (optionalBooking.isPresent()) {
@@ -84,11 +85,14 @@ public class BookingServiceImpl implements BookingService {
             Optional<User> optionalUser = userStorage.findById(userId);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                if (booking.getItem().getOwner().equals(user) || booking.getBooker().equals(user)) {
-                    return BookingMapper.toBookingDto(booking);
+                if (booking.getBooker().equals(user)) {
+                    if (booking.getItem().getOwner().equals(user)) {
+                        return BookingMapper.toBookingDto(booking);
+                    } else {
+                        throw new UserNotOwner("User not Owner", userId);
+                    }
                 } else {
-                    throw new UserNotOwner("User not Owner", userId);
-                    //Не получается выбросить UserNotBooker
+                    throw new UserNotBooker("User not Booker", userId);
                 }
             } else {
                 throw new UserNotFound("User not found", userId);
@@ -103,46 +107,26 @@ public class BookingServiceImpl implements BookingService {
         Optional<User> optionalUser = userStorage.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
+            //TODO Сделать проверку Booker
             if (state.equals("ALL")) {
                 return bookingRepository.findAllByBooker(user).stream()
                         .sorted(Comparator.comparing(Booking::getStart))
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            if (state.equals("CURRENT")) {
-                return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.APPROVED).stream()
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
-            }
-            if (state.equals("PAST")) {
-                return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.CANCELED).stream()
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
-            }
-            if (state.equals("WAITING")) {
-                return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.WAITING).stream()
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
-            }
-            if (state.equals("REJECTED")) {
-                return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.REJECTED).stream()
-                        .sorted(Comparator.comparing(Booking::getStart))
-                        .map(BookingMapper::toBookingDto)
-                        .collect(Collectors.toList());
-            }
+            return bookingRepository.findAllByBookerAndStatus(user, BookingStatus.fromString(state)).stream()
+                    .sorted(Comparator.comparing(Booking::getStart))
+                    .map(BookingMapper::toBookingDto)
+                    .collect(Collectors.toList());
         } else {
             throw new UserNotFound("User not found", userId);
         }
-        return new ArrayList<>();
     }
 
     @Override
     public List<BookingDto> getAllBookingsByOwner(String state, long userId) throws UserNotFound {
         Optional<User> optionalUser = userStorage.findById(userId);
-        if(optionalUser.isPresent()) {
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (state.equals("ALL")) {
                 return bookingRepository.findAllByItemOwner(userId).stream()

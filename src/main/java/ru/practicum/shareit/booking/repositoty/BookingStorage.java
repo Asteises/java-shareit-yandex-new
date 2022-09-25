@@ -18,14 +18,14 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBooker(User user);
     List<Booking> findAllByBookerAndStatus(User user, BookingStatus status);
     @Query(value = "select * from BOOKINGS B " +
-            "join USERS_ITEMS UI on UI.ITEM_ID = B.ITEM_ID " +
-            "where UI.USER_ID = :userId",
+            "join ITEMS I on I.ID = B.ITEM_ID " +
+            "where I.OWNER_ID = ?1",
             nativeQuery = true)
     List<Booking> findAllByItemOwner(long userId);
 
     @Query(value = "select * from BOOKINGS B " +
-            "join USERS_ITEMS UI on UI.ITEM_ID = B.ITEM_ID " +
-            "where UI.USER_ID = :userId and B.STATUS = :status",
+            "join ITEMS I on I.ID = B.ITEM_ID " +
+            "where I.OWNER_ID = ?1 and B.STATUS = ?2",
             nativeQuery = true)
     List<Booking> findAllByItemOwnerAndStatus(long userId, BookingStatus status);
 

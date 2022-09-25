@@ -23,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto save(UserDto userDto) {
+        System.out.println(userStorage.findAll());
         if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             User checkUser =
                     userStorage.findAll().stream()

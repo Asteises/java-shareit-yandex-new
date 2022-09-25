@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class UserDto {
 
-    private long id;
+    private Long id;
     @NotNull
     @NotBlank
     private String name;

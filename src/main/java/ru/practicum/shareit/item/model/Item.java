@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +55,9 @@ public class Item {
     // Или мы же можем хранить все отзывы прямо в Item? Так бы при появлении отзыва можно было бы просто сохранить его...
     // Или когда мы объявляем @Entity то связываем сущность напрямую с таблицей БД
     // и не можем иметь в ней дополнительные поля, которые не задействованы в таблице?
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinTable(name = "COMMENTS",
-//            joinColumns = @JoinColumn(name = "ITEM_ID"),
-//            inverseJoinColumns = @JoinColumn(name = "ID"))
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "COMMENTS",
+            joinColumns = @JoinColumn(name = "ITEM_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ID"))
     private List<Comment> comments = new ArrayList<>();
 }
