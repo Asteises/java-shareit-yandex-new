@@ -52,7 +52,8 @@ public class UserServiceImpl implements UserService {
                     if (userDto.getName() != null) {
                         user.setName(userDto.getName());
                     }
-                    if (userDto.getEmail() != null) {
+                    //TODO Валидация email...
+                    if (userDto.getEmail() != null && User.validate(userDto.getEmail())) {
                         user.setEmail(userDto.getEmail());
                     }
                     userStorage.save(user);
