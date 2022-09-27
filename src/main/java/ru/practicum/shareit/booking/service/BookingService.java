@@ -9,12 +9,13 @@ import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.exceptions.UserNotOwner;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public interface BookingService {
 
     BookingDto save(BookingDto bookingDto, long userId)
-            throws UserNotFound, ItemNotFound;
+            throws UserNotFound, ItemNotFound, TimeoutException;
 
     BookingDto ownerDecision(long bookingId, long userId, Boolean isApproved)
             throws BookingNotFound, UserNotOwner;

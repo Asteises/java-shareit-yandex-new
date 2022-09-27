@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;

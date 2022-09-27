@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.exceptions.UserNotOwner;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookingDto save(@RequestBody BookingDto bookingDto,
-                           @RequestHeader("X-Sharer-User-Id") long userId) {
+                           @RequestHeader("X-Sharer-User-Id") long userId) throws TimeoutException {
         return bookingService.save(bookingDto, userId);
     }
 

@@ -17,10 +17,14 @@ import ru.practicum.shareit.user.exceptions.UserNotOwner;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,22 +36,27 @@ public class BookingServiceImpl implements BookingService {
     private final ItemStorage itemStorage;
 
     @Override
-    public BookingDto save(BookingDto bookingDto, long userId) throws UserNotFound, ItemNotFound {
-        Optional<User> optionalUser = userStorage.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            Optional<Item> optionalItem = itemStorage.findById(bookingDto.getItemId());
-            if (optionalItem.isPresent()) {
-                Item item = optionalItem.get();
-                Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
-                bookingRepository.save(booking);
-                return BookingMapper.toBookingDto(booking);
+    public BookingDto save(BookingDto bookingDto, long userId) throws UserNotFound, ItemNotFound, TimeoutException {
+        if (validateDates(bookingDto.getStart(), bookingDto.getEnd())) {
+            Optional<User> optionalUser = userStorage.findById(userId);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                Optional<Item> optionalItem = itemStorage.findById(bookingDto.getItemId());
+                if (optionalItem.isPresent()) {
+                    Item item = optionalItem.get();
+                    Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
+                    bookingRepository.save(booking);
+                    return BookingMapper.toBookingDto(booking);
+                } else {
+                    throw new ItemNotFound("Item not found", bookingDto.getItemId());
+                }
             } else {
-                throw new ItemNotFound("Item not found", bookingDto.getItemId());
+                throw new UserNotFound("User not found", userId);
             }
         } else {
-            throw new UserNotFound("User not found", userId);
+            throw new TimeoutException("Wrong Time");
         }
+
     }
 
     @Override
@@ -158,6 +167,16 @@ public class BookingServiceImpl implements BookingService {
             throw new UserNotFound("User not found", userId);
         }
         return new ArrayList<>();
+    }
+
+    public static boolean validateDates(LocalDateTime start, LocalDateTime end) {
+        try {
+            LocalDateTime current = LocalDateTime.now();
+            return (start.isEqual(current) || start.isAfter(current)) && end.isAfter(start);
+        } catch (DateTimeParseException ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
 }

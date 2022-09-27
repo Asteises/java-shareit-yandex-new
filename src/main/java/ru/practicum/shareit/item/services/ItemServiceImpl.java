@@ -105,10 +105,15 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    // TODO не работает
     @Override
     public List<ItemDto> findAllByItemName(String text) {
-        return itemStorage.findAllByName(text).stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        text.toLowerCase();
+
+
+        List<ItemDto> itemDtos = itemStorage.findAll().stream().filter(item -> item.getName().toLowerCase().contains(text))
+                .map(ItemMapper::toItemDto).collect(Collectors.toList());
+        System.out.println(itemDtos);
+        return itemDtos;
     }
 }

@@ -16,7 +16,9 @@ import java.util.List;
 public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBooker(User user);
+
     List<Booking> findAllByBookerAndStatus(User user, BookingStatus status);
+
     @Query(value = "select * from BOOKINGS B " +
             "join ITEMS I on I.ID = B.ITEM_ID " +
             "where I.OWNER_ID = ?1",

@@ -36,25 +36,21 @@ public class Item {
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    @Column(name = "DESCRIPTION", insertable = false, updatable = false)
+    //TODO Почему так?
+    @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "DESCRIPTION")
+    @Column(name = "AVAILABLE")
     private Boolean available;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "OWNER_ID", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "OWNER_ID")
     private User owner;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "REQUEST_ID")
     private ItemRequest request;
 
-    //TODO Задача - вывести все отзывы для Item. Варианты - связать таблицы с помощью JPA или хранить отзывы внутри Item.
-    // Как связать таблицы с помощью JPA и передать их в сущность?
-    // Или мы же можем хранить все отзывы прямо в Item? Так бы при появлении отзыва можно было бы просто сохранить его...
-    // Или когда мы объявляем @Entity то связываем сущность напрямую с таблицей БД
-    // и не можем иметь в ней дополнительные поля, которые не задействованы в таблице?
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "COMMENTS",
             joinColumns = @JoinColumn(name = "ITEM_ID"),

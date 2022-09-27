@@ -20,7 +20,7 @@ create table if not exists ITEMS
     NAME varchar(255) not null,
     DESCRIPTION varchar(1024),
     AVAILABLE boolean,
-    OWNER_ID bigint unique not null,
+    OWNER_ID bigint,
     REQUEST_ID bigint,
     foreign key (OWNER_ID) references USERS (ID) on delete cascade,
     foreign key (REQUEST_ID) references REQUESTS (ID)
@@ -44,13 +44,7 @@ create table if not exists COMMENTS
     TEXT varchar(1024),
     ITEM_ID bigint not null,
     AUTHOR_ID bigint not null,
-    CREATED timestamp
-);
-
-create table if not exists USERS_COMMENTS
-(
-    USER_ID bigint primary key,
-    COMMENT_ID bigint,
-    foreign key (USER_ID) references USERS (ID) on delete cascade,
-    foreign key (COMMENT_ID) references COMMENTS (ID) on delete cascade
+    CREATED timestamp,
+    foreign key (ITEM_ID) references ITEMS (ID) on delete cascade,
+    foreign key (AUTHOR_ID) references USERS (ID) on delete cascade
 );
