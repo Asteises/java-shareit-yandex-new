@@ -14,7 +14,9 @@ public class BookingMapper {
 
     public static BookingDto toBookingDto(Booking booking) {
         return new BookingDto(
+                booking.getId(),
                 booking.getItem().getId(),
+                booking.getBooker().getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getStatus());

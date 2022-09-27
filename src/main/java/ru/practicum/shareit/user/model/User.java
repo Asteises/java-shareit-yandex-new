@@ -13,8 +13,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Getter
 @Setter

@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.BookingNotFound;
+import ru.practicum.shareit.booking.exception.BookingWrongTime;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.user.exceptions.UserNotBooker;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
@@ -15,9 +16,9 @@ import java.util.concurrent.TimeoutException;
 public interface BookingService {
 
     BookingDto save(BookingDto bookingDto, long userId)
-            throws UserNotFound, ItemNotFound, TimeoutException;
+            throws UserNotFound, ItemNotFound, BookingWrongTime;
 
-    BookingDto ownerDecision(long bookingId, long userId, Boolean isApproved)
+    BookingDto ownerDecision(long bookingId, long userId, boolean approved)
             throws BookingNotFound, UserNotOwner;
 
     BookingDto getBooking(long bookingId, long userID)

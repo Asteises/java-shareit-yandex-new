@@ -32,8 +32,8 @@ public class CommentServiceImpl implements CommentService {
             Optional<Item> optionalItem = itemStorage.findById(itemId);
             if (optionalItem.isPresent()) {
                 Item item = optionalItem.get();
-                Booking booking = bookingStorage.findByItemAndBooker(item, user);
-                if (booking != null) {
+                Optional<Booking> optionalBooking = bookingStorage.findByItemAndBooker(item, user);
+                if (optionalBooking.isPresent()) {
                     Comment comment = new Comment();
                     comment.setAuthor(user);
                     comment.setItem(item);

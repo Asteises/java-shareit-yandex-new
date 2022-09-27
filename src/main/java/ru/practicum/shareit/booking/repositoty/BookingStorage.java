@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingStorage extends JpaRepository<Booking, Long> {
@@ -31,7 +32,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findAllByItemOwnerAndStatus(long userId, String status);
 
-    Booking findByItemAndBooker(Item item, User bookerId);
+    Optional<Booking> findByItemAndBooker(Item item, User bookerId);
 
     List<Booking> findByBooker_IdAndEndIsBefore(Long bookerId, LocalDateTime end, Sort sort);
 }

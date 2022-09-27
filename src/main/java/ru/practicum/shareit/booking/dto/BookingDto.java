@@ -15,8 +15,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingDto {
 
+    private long id;
+
     @NotNull
-    private Long itemId;
+    private long itemId;
+
+    @NotNull
+    private long bookerId;
 
     @NotNull
     @FutureOrPresent

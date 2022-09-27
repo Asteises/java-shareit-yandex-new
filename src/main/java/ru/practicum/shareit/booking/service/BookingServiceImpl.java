@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.exception.BookingNotFound;
+import ru.practicum.shareit.booking.exception.BookingWrongTime;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositoty.BookingStorage;
@@ -19,13 +20,11 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemStorage itemStorage;
 
     @Override
-    public BookingDto save(BookingDto bookingDto, long userId) throws UserNotFound, ItemNotFound, TimeoutException {
+    public BookingDto save(BookingDto bookingDto, long userId) throws UserNotFound, ItemNotFound, BookingWrongTime {
         if (validateDates(bookingDto.getStart(), bookingDto.getEnd())) {
             Optional<User> optionalUser = userStorage.findById(userId);
             if (optionalUser.isPresent()) {
@@ -47,6 +46,8 @@ public class BookingServiceImpl implements BookingService {
                     Item item = optionalItem.get();
                     if (item.getAvailable()) {
                         Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
+                        Optional<Booking> optionalBooking = bookingRepository.findByItemAndBooker(item, user);
+                        optionalBooking.ifPresent(value -> booking.setId(value.getId()));
                         bookingRepository.save(booking);
                         return BookingMapper.toBookingDto(booking);
                     } else {
@@ -59,20 +60,19 @@ public class BookingServiceImpl implements BookingService {
                 throw new UserNotFound("User not found", userId);
             }
         } else {
-            throw new TimeoutException("Wrong Time");
+            throw new BookingWrongTime("Booking wrong Time");
         }
 
     }
 
     @Override
-    public BookingDto ownerDecision(long bookingId,
-                                    long userId,
-                                    Boolean isApproved) throws BookingNotFound, UserNotOwner {
+    public BookingDto ownerDecision(long bookingId, long ownerId, boolean approved)
+            throws BookingNotFound, UserNotOwner {
         Optional<Booking> optionalBooking = bookingRepository.findById(bookingId);
         if (optionalBooking.isPresent()) {
             Booking booking = optionalBooking.get();
-            if (booking.getItem().getOwner().getId().equals(userId)) {
-                if (isApproved) {
+            if (booking.getItem().getOwner().getId().equals(ownerId)) {
+                if (approved) {
                     booking.setStatus(BookingStatus.APPROVED);
                 } else {
                     booking.setStatus(BookingStatus.REJECTED);
@@ -80,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(booking);
                 return BookingMapper.toBookingDto(booking);
             } else {
-                throw new UserNotOwner("This User not Owner for this Item", userId);
+                throw new UserNotOwner("This User not Owner for this Item", ownerId);
             }
         } else {
             throw new BookingNotFound("Booking not found", bookingId);
@@ -177,7 +177,7 @@ public class BookingServiceImpl implements BookingService {
     public static boolean validateDates(LocalDateTime start, LocalDateTime end) {
         try {
             LocalDateTime current = LocalDateTime.now();
-            return (start.isEqual(current) || start.isAfter(current)) && end.isAfter(start);
+            return (start.isEqual(current) || start.isAfter(current)) && end.isAfter(start) && end.isAfter(current);
         } catch (DateTimeParseException ex) {
             ex.printStackTrace();
         }
