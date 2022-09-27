@@ -29,7 +29,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "join ITEMS I on I.ID = B.ITEM_ID " +
             "where I.OWNER_ID = ?1 and B.STATUS = ?2",
             nativeQuery = true)
-    List<Booking> findAllByItemOwnerAndStatus(long userId, BookingStatus status);
+    List<Booking> findAllByItemOwnerAndStatus(long userId, String status);
 
     Booking findByItemAndBooker(Item item, User bookerId);
 

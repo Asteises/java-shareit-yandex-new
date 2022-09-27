@@ -8,12 +8,14 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 @Repository
-public interface ItemStorage extends JpaRepository<Item, Long> {
+public interface ItemStorage extends JpaRepository<Item, Long>, ItemStorageCustom {
 
     List<Item> findAllByOwnerId(Long userId);
 
     @Query(value = "select * from ITEMS I " +
-            "where lower(I.NAME) = ?1 OR lower(I.DESCRIPTION) = ?2"
+            "where (lower(I.NAME) LIKE lower(concat('%', :name, '%')) " +
+            "OR lower(I.DESCRIPTION) LIKE lower(concat('%', :description, '%'))" +
+            "AND I.AVAILABLE = TRUE)"
             , nativeQuery = true)
     List<Item> findAllByNameAndDescriptionLowerCase(String name, String description);
 

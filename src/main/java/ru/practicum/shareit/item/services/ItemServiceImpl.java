@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.exceptions.ItemNullParametr;
@@ -12,6 +13,7 @@ import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repositoryes.UserStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -107,13 +109,14 @@ public class ItemServiceImpl implements ItemService {
 
     // TODO не работает
     @Override
+    @Transactional
     public List<ItemDto> findAllByItemName(String text) {
-        text.toLowerCase();
-
-
-        List<ItemDto> itemDtos = itemStorage.findAll().stream().filter(item -> item.getName().toLowerCase().contains(text))
-                .map(ItemMapper::toItemDto).collect(Collectors.toList());
-        System.out.println(itemDtos);
-        return itemDtos;
+        if (!text.isEmpty()) {
+            text = text.toLowerCase();
+            List<ItemDto> itemDtos = itemStorage.findAllByNameAndDescriptionLowerCase(text, text).stream()
+                    .map(ItemMapper::toItemDto).collect(Collectors.toList());
+            return itemDtos;
+        }
+        return Collections.emptyList();
     }
 }

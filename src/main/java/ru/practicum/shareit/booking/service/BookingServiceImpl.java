@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repositoty.BookingStorage;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
+import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
 import ru.practicum.shareit.user.exceptions.UserNotBooker;
@@ -44,9 +45,13 @@ public class BookingServiceImpl implements BookingService {
                 Optional<Item> optionalItem = itemStorage.findById(bookingDto.getItemId());
                 if (optionalItem.isPresent()) {
                     Item item = optionalItem.get();
-                    Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
-                    bookingRepository.save(booking);
-                    return BookingMapper.toBookingDto(booking);
+                    if (item.getAvailable()) {
+                        Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
+                        bookingRepository.save(booking);
+                        return BookingMapper.toBookingDto(booking);
+                    } else {
+                        throw new ItemNullParametr("Item is FALSE");
+                    }
                 } else {
                     throw new ItemNotFound("Item not found", bookingDto.getItemId());
                 }
@@ -144,22 +149,22 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             }
             if (state.equals("CURRENT")) {
-                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.APPROVED).stream()
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.APPROVED.name()).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("PAST")) {
-                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.CANCELED).stream()
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.CANCELED.name()).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("WAITING")) {
-                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.WAITING).stream()
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.WAITING.name()).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
             if (state.equals("REJECTED")) {
-                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.REJECTED).stream()
+                return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.REJECTED.name()).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }

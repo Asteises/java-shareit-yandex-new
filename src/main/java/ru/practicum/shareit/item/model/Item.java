@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
@@ -27,6 +28,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "ITEMS")
+@ToString
 public class Item {
 
     @Id
@@ -36,7 +38,6 @@ public class Item {
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    //TODO Почему так?
     @Column(name = "DESCRIPTION")
     private String description;
 
@@ -55,5 +56,6 @@ public class Item {
     @JoinTable(name = "COMMENTS",
             joinColumns = @JoinColumn(name = "ITEM_ID"),
             inverseJoinColumns = @JoinColumn(name = "ID"))
+    @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
 }

@@ -13,6 +13,8 @@ import ru.practicum.shareit.user.repositoryes.UserStorage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,7 +54,7 @@ public class UserServiceImpl implements UserService {
                         user.setName(userDto.getName());
                     }
                     //TODO Валидация email...
-                    if (userDto.getEmail() != null && User.validate(userDto.getEmail())) {
+                    if (userDto.getEmail() != null && validate(userDto.getEmail())) {
                         user.setEmail(userDto.getEmail());
                     }
                     userStorage.save(user);
@@ -93,5 +95,14 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserNotFound("User %s not found", userId);
         }
+    }
+
+    //TODO Валидация Email
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX_1 =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validate(String emailStr) {
+        Matcher matcher1 = VALID_EMAIL_ADDRESS_REGEX_1.matcher(emailStr);
+        return matcher1.find();
     }
 }
