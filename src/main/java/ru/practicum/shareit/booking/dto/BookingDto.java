@@ -17,20 +17,20 @@ public class BookingDto {
 
     private long id;
 
-    @NotNull
+
     private long itemId;
 
-    @NotNull
+
     private long bookerId;
 
-    @NotNull
+
     @FutureOrPresent
     private LocalDateTime start;
 
-    @NotNull
+
     @Future
     private LocalDateTime end;
 
-    @NotNull
+
     private BookingStatus status;
 }

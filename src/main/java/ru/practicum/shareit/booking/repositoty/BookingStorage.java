@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface BookingStorage extends JpaRepository<Booking, Long> {
 
-    List<Booking> findAllByBooker(User user);
+    List<Booking> findAllByBookerOrderByStartDesc(User user);
 
     List<Booking> findAllByBookerAndStatus(User user, BookingStatus status);
 
@@ -31,6 +31,8 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "where I.OWNER_ID = ?1 and B.STATUS = ?2",
             nativeQuery = true)
     List<Booking> findAllByItemOwnerAndStatus(long userId, String status);
+
+    List<Booking> findAllByItemIdAndBookerIdAndStatusOrderByStartDesc(long itemId, long bookerId, BookingStatus status);
 
     Optional<Booking> findByItemAndBooker(Item item, User bookerId);
 

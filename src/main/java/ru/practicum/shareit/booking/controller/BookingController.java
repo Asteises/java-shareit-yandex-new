@@ -31,9 +31,9 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto save(@RequestBody BookingDto bookingDto,
+    public BookingDto createBooking(@RequestBody BookingDto bookingDto,
                            @RequestHeader("X-Sharer-User-Id") long userId) throws BookingWrongTime {
-        return bookingService.save(bookingDto, userId);
+        return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
