@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto patchUser(UserDto userDto, long userId) {
+    public UserDto updateUser(UserDto userDto, long userId) {
         User user = checkUser(userId);
         if (userDto.getEmail() != null) {
             user.setEmail(userDto.getEmail());
@@ -53,14 +53,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<UserDto> findAllUsers() {
         return userStorage.findAll().stream()
                 .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto findById(long userId) {
+    public UserDto findUserById(long userId) {
         User user = checkUser(userId);
         return UserMapper.toUserDto(user);
     }

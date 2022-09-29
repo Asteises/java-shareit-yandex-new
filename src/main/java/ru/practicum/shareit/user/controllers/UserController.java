@@ -26,8 +26,8 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto patch(@RequestBody UserDto userDto, @PathVariable long userId) {
-        return userService.patchUser(userDto, userId);
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable long userId) {
+        return userService.updateUser(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
@@ -38,13 +38,13 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> findAll() {
-        return userService.findAll();
+    public List<UserDto> findAllUsers() {
+        return userService.findAllUsers();
     }
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto findById(@PathVariable long userId) {
-        return userService.findById(userId);
+    public UserDto findUserById(@PathVariable long userId) {
+        return userService.findUserById(userId);
     }
 }

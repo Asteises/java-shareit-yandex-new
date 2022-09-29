@@ -82,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(booking);
                 return BookingMapper.toBookingDto(booking);
             } else {
-                throw new UserNotOwner("This User not Owner for this Item", ownerId);
+                throw new UserNotOwner("This User not Owner for this Item");
             }
         } else {
             throw new BookingNotFound("Booking not found", bookingId);
@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
                     if (booking.getItem().getOwner().equals(user)) {
                         return BookingMapper.toBookingDto(booking);
                     } else {
-                        throw new UserNotOwner("User not Owner", userId);
+                        throw new UserNotOwner("User not Owner");
                     }
                 } else {
                     throw new UserNotBooker("User not Booker", userId);

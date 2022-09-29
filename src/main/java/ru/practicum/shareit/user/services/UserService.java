@@ -13,13 +13,15 @@ public interface UserService {
 
     UserDto createUser(UserDto userDto) throws UserDtoBadRequest;
 
-    UserDto patchUser(UserDto userDto, long userId);
+    UserDto updateUser(UserDto userDto, long userId);
 
     void deleteUser(long userId);
 
-    List<UserDto> findAll();
+    List<UserDto> findAllUsers();
 
-    UserDto findById(long userId);
+    UserDto findUserById(long userId);
 
     User checkUser(long userId) throws UserNotFound;
+
+
 }

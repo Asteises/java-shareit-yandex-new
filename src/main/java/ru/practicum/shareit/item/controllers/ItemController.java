@@ -22,41 +22,41 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto save(@RequestBody ItemDto itemDto,
-                        @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
-        return itemService.save(itemDto, userId);
+    public ItemDto createItem(@RequestBody ItemDto itemDto,
+                              @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
+        return itemService.createItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemDto patch(@RequestBody ItemDto itemDto,
-                         @PathVariable long itemId,
-                         @RequestHeader("X-Sharer-User-Id") long userId) throws ItemNotFound, UserNotFound {
-        return itemService.put(itemDto, itemId, userId);
+    public ItemDto updateItem(@RequestBody ItemDto itemDto,
+                              @PathVariable long itemId,
+                              @RequestHeader("X-Sharer-User-Id") long userId) throws ItemNotFound, UserNotFound {
+        return itemService.updateItem(itemDto, itemId, userId);
     }
 
     @DeleteMapping("/{itemId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable long itemId) {
-        itemService.delete(itemId);
+    public void deleteItem(@PathVariable long itemId) {
+        itemService.deleteItem(itemId);
     }
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemDto findById(@PathVariable long itemId) {
-        return itemService.findById(itemId);
+    public ItemDto findItemById(@PathVariable long itemId) {
+        return itemService.findItemById(itemId);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> findAllByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.findAllByUserId(userId);
+    public List<ItemDto> findAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findAllItemsByUserId(userId);
     }
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> findAllByItemName(@RequestParam String text) {
-        return itemService.findAllByItemName(text);
+    public List<ItemDto> searchItemsByNameAndDescription(@RequestParam String text) {
+        return itemService.searchItemsByNameAndDescription(text);
     }
 
     @PostMapping("/{itemId}/comment")

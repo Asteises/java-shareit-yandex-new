@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.services;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
 
 import java.util.List;
@@ -10,17 +11,19 @@ import java.util.List;
 @Service
 public interface ItemService {
 
-    ItemDto save(ItemDto itemDto, long userId) throws UserNotFound;
+    ItemDto createItem(ItemDto itemDto, long userId) throws UserNotFound;
 
-    ItemDto put(ItemDto itemDto, long itemId, long userId) throws ItemNotFound, UserNotFound;
+    ItemDto updateItem(ItemDto itemDto, long itemId, long userId) throws ItemNotFound, UserNotFound;
 
-    void delete(long itemId) throws ItemNotFound;
+    void deleteItem(long itemId) throws ItemNotFound;
 
     List<ItemDto> findAll();
 
-    ItemDto findById(long itemId) throws ItemNotFound;
+    ItemDto findItemById(long itemId) throws ItemNotFound;
 
-    List<ItemDto> findAllByUserId(long userId);
+    List<ItemDto> findAllItemsByUserId(long userId);
 
-    List<ItemDto> findAllByItemName(String text);
+    List<ItemDto> searchItemsByNameAndDescription(String text);
+
+    Item checkItem(long itemId);
 }
