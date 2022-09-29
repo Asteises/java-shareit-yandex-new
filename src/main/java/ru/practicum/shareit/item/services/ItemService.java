@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.services;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
@@ -19,7 +20,7 @@ public interface ItemService {
 
     List<ItemDto> findAll();
 
-    ItemDto findItemById(long itemId) throws ItemNotFound;
+    ItemResponseDto findItemById(long itemId) throws ItemNotFound;
 
     List<ItemDto> findAllItemsByUserId(long userId);
 

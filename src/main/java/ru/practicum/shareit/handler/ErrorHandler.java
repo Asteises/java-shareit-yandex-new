@@ -32,8 +32,8 @@ public class ErrorHandler {
 
     //400
     @ExceptionHandler({ItemNullParametr.class})
-    public ResponseEntity<String> itemBadParam(final RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad or null parameter for Item");
+    public ResponseEntity<ErrorResponse> itemBadParam(final ItemNullParametr e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler({UserDtoBadRequest.class})

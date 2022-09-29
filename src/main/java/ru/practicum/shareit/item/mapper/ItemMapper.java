@@ -2,9 +2,12 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
@@ -45,5 +48,16 @@ public class ItemMapper {
             item.setComments(new ArrayList<>());
         }
         return item;
+    }
+
+    public static ItemResponseDto toItemResponseDto(Item item, Booking lastBooking, Booking nextBooking) {
+        return new ItemResponseDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                lastBooking,
+                nextBooking
+        );
     }
 }

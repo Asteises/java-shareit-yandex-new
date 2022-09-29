@@ -2,7 +2,10 @@ package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -23,6 +26,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage; // Если стоит final для неинициализированного поля то конструктор нужен обязательно
     private final UserService userService;
+
+    private final BookingService bookingService;
 
     @Override
     public ItemDto createItem(ItemDto itemDto, long userId) throws ItemNullParametr {
@@ -76,9 +81,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto findItemById(long itemId) {
+    public ItemResponseDto findItemById(long itemId) {
         Item item = checkItem(itemId);
-        return ItemMapper.toItemDto(item);
+        Booking lastBooking = bookingService.getLastBookingByItem(item.getOwner().getId(), itemId);
+        Booking nextBooking = bookingService.getNextBookingByItem(item.getOwner().getId(), itemId);
+        return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking);
     }
 
     @Override

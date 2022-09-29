@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.services.ItemService;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
@@ -43,7 +44,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemDto findItemById(@PathVariable long itemId) {
+    public ItemResponseDto findItemById(@PathVariable long itemId) {
         return itemService.findItemById(itemId);
     }
 

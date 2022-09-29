@@ -3,10 +3,11 @@ package ru.practicum.shareit.booking.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.services.ItemService;
+import ru.practicum.shareit.user.services.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,17 @@ public class BookingMapper {
         Booking booking = new Booking();
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
-        booking.setStatus(BookingStatus.WAITING);
         return booking;
+    }
+
+    public static BookingResponseDto toBookingResponseDto(Booking booking) {
+        return new BookingResponseDto(
+                booking.getId(),
+                booking.getItem(),
+                booking.getBooker(),
+                booking.getStatus(),
+                booking.getStart(),
+                booking.getEnd());
     }
 
 }
