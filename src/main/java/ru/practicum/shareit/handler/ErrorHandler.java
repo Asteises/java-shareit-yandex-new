@@ -18,16 +18,19 @@ import ru.practicum.shareit.user.exceptions.UserServerError;
 @RestControllerAdvice
 public class ErrorHandler {
 
+    //404
     @ExceptionHandler({UserNotFound.class, ItemNotFound.class, BookingNotFound.class})
     public ResponseEntity<String> userNotFoundHandler(final RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Something not found");
     }
 
+    //500
     @ExceptionHandler({UserDuplicatedEmail.class})
     public ResponseEntity<String> userDuplicatedEmail(final RuntimeException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Duplicated email");
     }
 
+    //400
     @ExceptionHandler({ItemNullParametr.class})
     public ResponseEntity<String> itemBadParam(final RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad or null parameter for Item");

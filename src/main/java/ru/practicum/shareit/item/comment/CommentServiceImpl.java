@@ -47,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
                 throw new ItemNotFound("Item not found", itemId);
             }
         } else {
-            throw new UserNotFound("User not found", userId);
+            throw new UserNotFound("User not found");
         }
     }
 }

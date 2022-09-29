@@ -22,13 +22,11 @@ public class BookingMapper {
                 booking.getStatus());
     }
 
-    public static Booking toBooking(BookingDto bookingDto, Item item, User user, BookingStatus status) {
+    public static Booking toBooking(BookingDto bookingDto) {
         Booking booking = new Booking();
-        booking.setItem(item);
-        booking.setBooker(user);
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
-        booking.setStatus(status);
+        booking.setStatus(BookingStatus.WAITING);
         return booking;
     }
 

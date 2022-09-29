@@ -40,13 +40,15 @@ public class BookingServiceImpl implements BookingService {
         if (validateDates(bookingDto.getStart(), bookingDto.getEnd())) {
             Optional<User> optionalUser = userStorage.findById(userId);
             if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
+                User booker = optionalUser.get();
                 Optional<Item> optionalItem = itemStorage.findById(bookingDto.getItemId());
                 if (optionalItem.isPresent()) {
                     Item item = optionalItem.get();
                     if (item.getAvailable()) {
-                        Booking booking = BookingMapper.toBooking(bookingDto, item, user, BookingStatus.WAITING);
-                        Optional<Booking> optionalBooking = bookingRepository.findByItemAndBooker(item, user);
+                        Booking booking = BookingMapper.toBooking(bookingDto);
+                        booking.setItem(item);
+                        booking.setBooker(booker);
+                        Optional<Booking> optionalBooking = bookingRepository.findByItemAndBooker(item, booker);
                         optionalBooking.ifPresent(value -> booking.setId(value.getId()));
                         bookingRepository.save(booking);
                         return BookingMapper.toBookingDto(booking);
@@ -57,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
                     throw new ItemNotFound("Item not found", bookingDto.getItemId());
                 }
             } else {
-                throw new UserNotFound("User not found", userId);
+                throw new UserNotFound("User not found");
             }
         } else {
             throw new BookingWrongTime("Booking wrong Time");
@@ -109,7 +111,7 @@ public class BookingServiceImpl implements BookingService {
                     throw new UserNotBooker("User not Booker", userId);
                 }
             } else {
-                throw new UserNotFound("User not found", userId);
+                throw new UserNotFound("User not found");
             }
         } else {
             throw new BookingNotFound("Booking not found", bookingId);
@@ -133,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
                     .map(BookingMapper::toBookingDto)
                     .collect(Collectors.toList());
         } else {
-            throw new UserNotFound("User not found", userId);
+            throw new UserNotFound("User not found");
         }
     }
 
@@ -169,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
             }
         } else {
-            throw new UserNotFound("User not found", userId);
+            throw new UserNotFound("User not found");
         }
         return new ArrayList<>();
     }

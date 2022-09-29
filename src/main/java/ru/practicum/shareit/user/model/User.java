@@ -29,9 +29,6 @@ public class User {
     @Column(name = "NAME", nullable = false, length = 255)
     private String name;
 
-    @Email
-    @NotNull
-    @NotBlank
     @Column(name = "EMAIL")
     private String email;
 }

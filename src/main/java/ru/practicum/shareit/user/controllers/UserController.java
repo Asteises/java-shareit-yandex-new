@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.services.UserService;
 
 import java.util.List;
@@ -21,20 +20,20 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto save(@RequestBody UserDto userDto) {
-        return userService.save(userDto);
+    public UserDto createUser(@RequestBody UserDto userDto) {
+        return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto patch(@RequestBody UserDto userDto, @PathVariable long userId) throws UserNotFound {
-        return userService.patch(userDto, userId);
+    public UserDto patch(@RequestBody UserDto userDto, @PathVariable long userId) {
+        return userService.patchUser(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable long userId) throws UserNotFound {
-        userService.delete(userId);
+    public void deleteUser(@PathVariable long userId) {
+        userService.deleteUser(userId);
     }
 
     @GetMapping
@@ -45,7 +44,7 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto findById(@PathVariable long userId) throws UserNotFound {
+    public UserDto findById(@PathVariable long userId) {
         return userService.findById(userId);
     }
 }

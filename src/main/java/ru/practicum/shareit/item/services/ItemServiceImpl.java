@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);
         } else {
-            throw new UserNotFound("User %s not found", userId);
+            throw new UserNotFound("User %s not found");
         }
     }
 
@@ -64,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
                 itemStorage.save(item);
                 return ItemMapper.toItemDto(item);
             } else {
-                throw new UserNotFound("User %s not found", userId);
+                throw new UserNotFound("User %s not found");
             }
         } else {
             throw new ItemNotFound("Item %s not found", itemId);
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
         } else {
-            throw new UserNotFound("User %s not found", userId);
+            throw new UserNotFound("User %s not found");
         }
     }
 
