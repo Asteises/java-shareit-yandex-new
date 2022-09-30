@@ -29,9 +29,9 @@ public interface BookingService {
 
     List<BookingResponseDto> getAllBookingsByOwner(String state, long userId) throws UserNotFound;
 
-    Booking getLastBookingByItem(long userId, long itemId);
+    Booking getLastBookingByItem(long itemId);
 
-    Booking getNextBookingByItem(long userId, long itemId);
+    Booking getNextBookingByItem(long itemId);
 
     Booking checkBooking(long bookingId) throws BookingNotFound;
 }

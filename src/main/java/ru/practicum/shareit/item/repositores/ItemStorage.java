@@ -19,5 +19,4 @@ public interface ItemStorage extends JpaRepository<Item, Long>, ItemStorageCusto
             , nativeQuery = true)
     List<Item> findAllByNameAndDescriptionLowerCase(String name, String description);
 
-    List<Item> findAllByNameContains(String name);
 }

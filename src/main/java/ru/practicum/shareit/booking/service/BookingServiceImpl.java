@@ -14,7 +14,6 @@ import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.services.ItemService;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
-import ru.practicum.shareit.user.exceptions.UserNotOwner;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.services.UserService;
 
@@ -153,23 +152,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking getLastBookingByItem(long userId, long itemId) {
-        User owner = userService.checkUser(userId);
-        Item item = itemService.checkItem(itemId);
-        if (item.getOwner().equals(owner)) {
-            return bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
-        }
-        throw new UserNotOwner("User not Owner");
+    public Booking getLastBookingByItem(long itemId) {
+        return bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(itemId, LocalDateTime.now());
     }
 
     @Override
-    public Booking getNextBookingByItem(long userId, long itemId) {
-        User owner = userService.checkUser(userId);
-        Item item = itemService.checkItem(itemId);
-        if (item.getOwner().equals(owner)) {
-            return bookingRepository.findFirstByItem_idAndStartAfterOrderByStartDesc(itemId, LocalDateTime.now());
-        }
-        throw new UserNotOwner("User not Owner");
+    public Booking getNextBookingByItem(long itemId) {
+        return bookingRepository.findFirstByItem_idAndStartAfterOrderByStartDesc(itemId, LocalDateTime.now());
     }
 
     @Override

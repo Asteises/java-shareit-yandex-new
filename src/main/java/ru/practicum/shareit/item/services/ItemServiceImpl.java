@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -12,6 +14,7 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
+import ru.practicum.shareit.user.exceptions.UserNotOwner;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.services.UserService;
 
@@ -26,8 +29,6 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage; // Если стоит final для неинициализированного поля то конструктор нужен обязательно
     private final UserService userService;
-
-    private final BookingService bookingService;
 
     @Override
     public ItemDto createItem(ItemDto itemDto, long userId) throws ItemNullParametr {
@@ -81,11 +82,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponseDto findItemById(long itemId) {
+    public ItemResponseDto findItemById(long itemId, long userId, BookingService bookingService) {
         Item item = checkItem(itemId);
-        Booking lastBooking = bookingService.getLastBookingByItem(item.getOwner().getId(), itemId);
-        Booking nextBooking = bookingService.getNextBookingByItem(item.getOwner().getId(), itemId);
-        return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking);
+        User user = userService.checkUser(userId);
+        if (user.equals(item.getOwner())) {
+            Booking lastBooking = bookingService.getLastBookingByItem(itemId);
+            Booking nextBooking = bookingService.getNextBookingByItem(itemId);
+            return ItemMapper.toItemResponseDto(item,
+                    BookingMapper.toBookingDto(lastBooking),
+                    BookingMapper.toBookingDto(nextBooking));
+        }
+        throw new UserNotOwner("User not Owner");
     }
 
     @Override

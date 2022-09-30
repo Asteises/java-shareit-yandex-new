@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -20,6 +21,7 @@ public class ItemController {
 
     private final ItemService itemService;
     private final CommentService commentService;
+    private final BookingService bookingService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,8 +46,9 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     @ResponseStatus(HttpStatus.OK)
-    public ItemResponseDto findItemById(@PathVariable long itemId) {
-        return itemService.findItemById(itemId);
+    public ItemResponseDto findItemById(@PathVariable long itemId,
+                                        @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findItemById(itemId, userId, bookingService);
     }
 
     @GetMapping
