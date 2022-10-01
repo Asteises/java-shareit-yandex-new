@@ -23,7 +23,7 @@ public interface ItemService {
 
     ItemResponseDto findItemById(long itemId, long userId, BookingService bookingService) throws ItemNotFound;
 
-    List<ItemDto> findAllItemsByUserId(long userId);
+    List<ItemResponseDto> findAllItemsByUserId(long userId, BookingService bookingService);
 
     List<ItemDto> searchItemsByNameAndDescription(String text);
 

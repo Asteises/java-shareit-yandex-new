@@ -53,8 +53,8 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> findAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.findAllItemsByUserId(userId);
+    public List<ItemResponseDto> findAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findAllItemsByUserId(userId, bookingService);
     }
 
     @GetMapping("/search")

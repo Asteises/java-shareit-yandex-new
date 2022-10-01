@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -13,12 +11,13 @@ import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
+import ru.practicum.shareit.user.exceptions.UserNotBooker;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
-import ru.practicum.shareit.user.exceptions.UserNotOwner;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.services.UserService;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,18 +87,24 @@ public class ItemServiceImpl implements ItemService {
         if (user.equals(item.getOwner())) {
             Booking lastBooking = bookingService.getLastBookingByItem(itemId);
             Booking nextBooking = bookingService.getNextBookingByItem(itemId);
-            return ItemMapper.toItemResponseDto(item,
-                    BookingMapper.toBookingDto(lastBooking),
-                    BookingMapper.toBookingDto(nextBooking));
+            return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking);
         }
-        throw new UserNotOwner("User not Owner");
+        if (bookingService.findAllBookingByItemIdAndBooker(itemId, userId).isEmpty()) {
+            throw new UserNotBooker("User not Booker", userId);
+        } else {
+            return ItemMapper.toItemResponseDto(item, null, null);
+        }
     }
 
     @Override
-    public List<ItemDto> findAllItemsByUserId(long userId) {
+    public List<ItemResponseDto> findAllItemsByUserId(long userId, BookingService bookingService) {
         User owner = userService.checkUser(userId);
-        return itemStorage.findAllByOwnerId(owner.getId()).stream()
-                .map(ItemMapper::toItemDto)
+        List<Item> items = itemStorage.findAllByOwnerIdOrderByIdAsc(owner.getId());
+        return items.stream().map(item -> ItemMapper.toItemResponseDto(
+                        item,
+                        bookingService.getLastBookingByItem(item.getId()),
+                        bookingService.getNextBookingByItem(item.getId())))
+                .sorted(Comparator.comparing(ItemResponseDto::getId))
                 .collect(Collectors.toList());
     }
 

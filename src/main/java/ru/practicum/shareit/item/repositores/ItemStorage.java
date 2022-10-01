@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ItemStorage extends JpaRepository<Item, Long>, ItemStorageCustom {
 
-    List<Item> findAllByOwnerId(Long userId);
+    List<Item> findAllByOwnerIdOrderByIdAsc(Long userId);
 
     @Query(value = "select * from ITEMS I " +
             "where (lower(I.NAME) LIKE lower(concat('%', :name, '%')) " +
