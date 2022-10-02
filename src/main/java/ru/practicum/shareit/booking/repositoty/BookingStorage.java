@@ -18,8 +18,6 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerOrderByStartDesc(User user);
 
-    List<Booking> findAllByBooker_idAndStatusOrderByStartDesc(long bookerId, BookingStatus status);
-
     @Query(value = "select * from BOOKINGS B " +
             "where B.BOOKER_ID = ?1 " +
             "and (B.STATUS = ?2 or B.STATUS = ?3) " +
@@ -36,6 +34,27 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "order by B.START_DATE desc",
             nativeQuery = true)
     List<Booking> findAllByBookerAndStatusOrderByStartDesc(long userId, String status);
+
+    List<Booking> findAllByBooker_IdAndEndIsBefore(long bookerId, LocalDateTime end);
+
+    List<Booking> findAllByBooker_idAndEndIsAfterAndStartIsBefore(long bookerId, LocalDateTime end, LocalDateTime start);
+
+    @Query(value = "select * from BOOKINGS B " +
+            "join ITEMS I on I.ID = B.ITEM_ID " +
+            "where I.OWNER_ID = ?1 " +
+            "and B.END_DATE < ?2 " +
+            "order by B.START_DATE desc ",
+            nativeQuery = true)
+    List<Booking> findAllByOwner_IdAndEndIsBefore(long ownerId, LocalDateTime end);
+
+
+    @Query(value = "select * from BOOKINGS B " +
+            "join ITEMS I on I.ID = B.ITEM_ID " +
+            "where I.OWNER_ID = ?1 " +
+            "and (B.END_DATE > ?2 and B.START_DATE < ?3)" +
+            "order by B.START_DATE desc ",
+            nativeQuery = true)
+    List<Booking> findAllByOwner_IdAndEndIsAfterAndStartIsBefore(long ownerId, LocalDateTime end, LocalDateTime start);
 
     @Query(value = "select * from BOOKINGS B " +
             "join ITEMS I on I.ID = B.ITEM_ID " +

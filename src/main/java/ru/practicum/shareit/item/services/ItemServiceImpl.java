@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
@@ -11,7 +12,6 @@ import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
-import ru.practicum.shareit.user.exceptions.UserNotBooker;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.services.UserService;
@@ -81,29 +81,31 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemResponseDto findItemById(long itemId, long userId, BookingService bookingService) {
+    public ItemResponseDto findItemById(long itemId,
+                                        long userId,
+                                        BookingService bookingService,
+                                        CommentService commentService) {
         Item item = checkItem(itemId);
         User user = userService.checkUser(userId);
         if (user.equals(item.getOwner())) {
             Booking lastBooking = bookingService.getLastBookingByItem(itemId);
             Booking nextBooking = bookingService.getNextBookingByItem(itemId);
-            return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking);
+            return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking, commentService);
         }
-        if (bookingService.findAllBookingByItemIdAndBooker(itemId, userId).isEmpty()) {
-            throw new UserNotBooker("User not Booker", userId);
-        } else {
-            return ItemMapper.toItemResponseDto(item, null, null);
-        }
+        return ItemMapper.toItemResponseDto(item, null, null, commentService);
     }
 
     @Override
-    public List<ItemResponseDto> findAllItemsByUserId(long userId, BookingService bookingService) {
+    public List<ItemResponseDto> findAllItemsByUserId(long userId,
+                                                      BookingService bookingService,
+                                                      CommentService commentService) {
         User owner = userService.checkUser(userId);
         List<Item> items = itemStorage.findAllByOwnerIdOrderByIdAsc(owner.getId());
         return items.stream().map(item -> ItemMapper.toItemResponseDto(
                         item,
                         bookingService.getLastBookingByItem(item.getId()),
-                        bookingService.getNextBookingByItem(item.getId())))
+                        bookingService.getNextBookingByItem(item.getId()),
+                        commentService))
                 .sorted(Comparator.comparing(ItemResponseDto::getId))
                 .collect(Collectors.toList());
     }

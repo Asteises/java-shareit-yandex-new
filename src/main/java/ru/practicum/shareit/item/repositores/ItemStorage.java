@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 @Repository
-public interface ItemStorage extends JpaRepository<Item, Long>, ItemStorageCustom {
+public interface ItemStorage extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOwnerIdOrderByIdAsc(Long userId);
 

@@ -111,12 +111,15 @@ public class BookingServiceImpl implements BookingService {
                     .collect(Collectors.toList());
         }
         if (state.equals("CURRENT")) {
-            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.APPROVED.name()).stream()
+            return bookingRepository.findAllByBooker_idAndEndIsAfterAndStartIsBefore(userId,
+                            LocalDateTime.now(),
+                            LocalDateTime.now().plusSeconds(1)
+                    ).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
         if (state.equals("PAST")) {
-            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.CANCELED.name()).stream()
+            return bookingRepository.findAllByBooker_IdAndEndIsBefore(userId, LocalDateTime.now()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
@@ -149,12 +152,15 @@ public class BookingServiceImpl implements BookingService {
                     .collect(Collectors.toList());
         }
         if (state.equals("CURRENT")) {
-            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.APPROVED.name()).stream()
+            return bookingRepository.findAllByOwner_IdAndEndIsAfterAndStartIsBefore(userId,
+                            LocalDateTime.now(),
+                            LocalDateTime.now().plusSeconds(1)
+                    ).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
         if (state.equals("PAST")) {
-            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.CANCELED.name()).stream()
+            return bookingRepository.findAllByOwner_IdAndEndIsBefore(userId, LocalDateTime.now()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }

@@ -53,15 +53,6 @@ public class BookingController {
         return bookingService.getBooking(bookingId, userId);
     }
 
-    /**
-     * Параметр state необязательный и по умолчанию равен ALL (англ. «все»).
-     * Также он может принимать значения CURRENT (англ. «текущие»),
-     * **PAST** (англ. «завершённые»),
-     * FUTURE (англ. «будущие»),
-     * WAITING (англ. «ожидающие подтверждения»),
-     * REJECTED (англ. «отклонённые»).
-     * Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
-     */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public List<BookingResponseDto> getAllBookingsByBooker(@RequestParam(defaultValue = "ALL") String state,
