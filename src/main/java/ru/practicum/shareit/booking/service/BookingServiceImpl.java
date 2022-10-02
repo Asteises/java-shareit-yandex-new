@@ -110,6 +110,26 @@ public class BookingServiceImpl implements BookingService {
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
+        if (state.equals("CURRENT")) {
+            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.APPROVED.name()).stream()
+                    .map(BookingMapper::toBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
+        if (state.equals("PAST")) {
+            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.CANCELED.name()).stream()
+                    .map(BookingMapper::toBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
+        if (state.equals("WAITING")) {
+            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.WAITING.name()).stream()
+                    .map(BookingMapper::toBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
+        if (state.equals("REJECTED")) {
+            return bookingRepository.findAllByBookerAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED.name()).stream()
+                    .map(BookingMapper::toBookingResponseDto)
+                    .collect(Collectors.toList());
+        }
         throw new ItemNullParametr("Unknown state: UNSUPPORTED_STATUS");
     }
 
@@ -129,22 +149,22 @@ public class BookingServiceImpl implements BookingService {
                     .collect(Collectors.toList());
         }
         if (state.equals("CURRENT")) {
-            return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.APPROVED.name()).stream()
+            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.APPROVED.name()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
         if (state.equals("PAST")) {
-            return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.CANCELED.name()).stream()
+            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.CANCELED.name()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
         if (state.equals("WAITING")) {
-            return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.WAITING.name()).stream()
+            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.WAITING.name()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }
         if (state.equals("REJECTED")) {
-            return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.REJECTED.name()).stream()
+            return bookingRepository.findAllByItemOwnerAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED.name()).stream()
                     .map(BookingMapper::toBookingResponseDto)
                     .collect(Collectors.toList());
         }

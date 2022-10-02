@@ -21,15 +21,16 @@ public class Comment {
     @Column(name = "ID")
     private Long id;
 
+    @Column(name = "TEXT")
     private String text;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ITEM_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ITEM_ID")
     private Item item;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "AUTHOR_ID", nullable = false)
+    @JoinColumn(name = "AUTHOR_ID")
     private User author;
 
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 }

@@ -31,6 +31,14 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     @Query(value = "select * from BOOKINGS B " +
             "join ITEMS I on I.ID = B.ITEM_ID " +
+            "where B.BOOKER_ID = ?1 " +
+            "and B.STATUS = ?2 " +
+            "order by B.START_DATE desc",
+            nativeQuery = true)
+    List<Booking> findAllByBookerAndStatusOrderByStartDesc(long userId, String status);
+
+    @Query(value = "select * from BOOKINGS B " +
+            "join ITEMS I on I.ID = B.ITEM_ID " +
             "where I.OWNER_ID = ?1 " +
             "order by B.START_DATE desc ",
             nativeQuery = true)
@@ -42,7 +50,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "and B.STATUS = ?2 " +
             "order by B.START_DATE desc",
             nativeQuery = true)
-    List<Booking> findAllByItemOwnerAndStatus(long userId, String status);
+    List<Booking> findAllByItemOwnerAndStatusOrderByStartDesc(long userId, String status);
 
     @Query(value = "select * from BOOKINGS B " +
             "join ITEMS I on I.ID = B.ITEM_ID " +

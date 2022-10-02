@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.comment.CommentDto;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,4 +24,6 @@ public class ItemResponseDto {
     private BookingDto lastBooking;
 
     private BookingDto nextBooking;
+
+    private List<CommentDto> comments;
 }
