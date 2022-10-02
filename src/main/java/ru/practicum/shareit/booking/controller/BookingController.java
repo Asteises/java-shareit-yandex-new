@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.exception.BookingNotFound;
 import ru.practicum.shareit.booking.exception.BookingWrongTime;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -31,46 +32,37 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto save(@RequestBody BookingDto bookingDto,
+    public BookingDto createBooking(@RequestBody BookingDto bookingDto,
                            @RequestHeader("X-Sharer-User-Id") long userId) throws BookingWrongTime {
-        return bookingService.save(bookingDto, userId);
+        return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
     @ResponseStatus(HttpStatus.OK)
-    public BookingDto ownerDecision(@PathVariable long bookingId,
-                                    @RequestHeader("X-Sharer-User-Id") long userId,
-                                    @RequestParam boolean approved) throws BookingNotFound, UserNotOwner {
+    public BookingResponseDto ownerDecision(@PathVariable long bookingId,
+                                            @RequestHeader("X-Sharer-User-Id") long userId,
+                                            @RequestParam boolean approved) throws BookingNotFound, UserNotOwner {
         return bookingService.ownerDecision(bookingId, userId, approved);
     }
 
     @GetMapping("/{bookingId}")
     @ResponseStatus(HttpStatus.OK)
-    public BookingDto getBooking(@PathVariable long bookingId,
+    public BookingResponseDto getBooking(@PathVariable long bookingId,
                                  @RequestHeader("X-Sharer-User-Id") long userId)
             throws BookingNotFound, UserNotFound, UserNotOwner, UserNotBooker {
         return bookingService.getBooking(bookingId, userId);
     }
 
-    /**
-     * Параметр state необязательный и по умолчанию равен ALL (англ. «все»).
-     * Также он может принимать значения CURRENT (англ. «текущие»),
-     * **PAST** (англ. «завершённые»),
-     * FUTURE (англ. «будущие»),
-     * WAITING (англ. «ожидающие подтверждения»),
-     * REJECTED (англ. «отклонённые»).
-     * Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
-     */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingDto> getAllBookingsByBooker(@RequestParam(defaultValue = "ALL") String state,
+    public List<BookingResponseDto> getAllBookingsByBooker(@RequestParam(defaultValue = "ALL") String state,
                                                    @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
         return bookingService.getAllBookingsByBooker(state, userId);
     }
 
     @GetMapping("/owner")
     @ResponseStatus(HttpStatus.OK)
-    public List<BookingDto> getAllBookingsByOwner(@RequestParam(defaultValue = "ALL") String state,
+    public List<BookingResponseDto> getAllBookingsByOwner(@RequestParam(defaultValue = "ALL") String state,
                                                   @RequestHeader("X-Sharer-User-Id") long userId) throws UserNotFound {
         return bookingService.getAllBookingsByOwner(state, userId);
     }

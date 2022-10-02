@@ -8,7 +8,13 @@ import org.springframework.stereotype.Service;
 public class CommentMapper {
 
     public static CommentDto toCommentDto(Comment comment) {
-        return null;
+        return new CommentDto(
+                comment.getId(),
+                comment.getText(),
+                comment.getItem().getId(),
+                comment.getAuthor().getName(),
+                comment.getCreated()
+        );
     }
 
     public static Comment toComment(CommentDto commentDto) {

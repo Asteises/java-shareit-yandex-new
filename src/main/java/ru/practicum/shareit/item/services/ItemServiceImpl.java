@@ -2,8 +2,11 @@ package ru.practicum.shareit.item.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.item.comment.CommentService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFound;
 import ru.practicum.shareit.item.exceptions.ItemNullParametr;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -11,9 +14,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repositores.ItemStorage;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repositoryes.UserStorage;
+import ru.practicum.shareit.user.services.UserService;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,59 +27,50 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemStorage itemStorage; // Если стоит final для неинициализированного поля то конструктор нужен обязательно
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     @Override
-    public ItemDto save(ItemDto itemDto, long userId) throws UserNotFound {
-        Optional<User> optionalUser = userStorage.findById(userId);
-        if (optionalUser.isPresent()) {
-            Item item = ItemMapper.toItem(itemDto, optionalUser.get(), null);
-            if (item.getAvailable() == null) {
-                throw new ItemNullParametr(String.format("Available not exist - %s", item.getAvailable()));
+    public ItemDto createItem(ItemDto itemDto, long userId) throws ItemNullParametr {
+        User owner = userService.checkUser(userId);
+        Item item = ItemMapper.toItem(itemDto, owner, null);
+        if (item.getAvailable() == null) {
+            throw new ItemNullParametr(String.format("Available not exist - %s", item.getAvailable()));
+        }
+        if (item.getName() == null || item.getName().isEmpty()) {
+            throw new ItemNullParametr(String.format("Name not exist - %s", item.getName()));
+        }
+        if (item.getDescription() == null || item.getDescription().isEmpty()) {
+            throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
+        }
+        itemStorage.save(item);
+        return ItemMapper.toItemDto(item);
+    }
+
+    @Override
+    public ItemDto updateItem(ItemDto itemDto, long itemId, long userId) throws UserNotFound {
+        Item item = checkItem(itemId);
+        User owner = userService.checkUser(userId);
+        if (item.getOwner().equals(owner)) {
+            if (itemDto.getAvailable() != null) {
+                item.setAvailable(itemDto.getAvailable());
             }
-            if (item.getName() == null || item.getName().isEmpty()) {
-                throw new ItemNullParametr(String.format("Name not exist - %s", item.getName()));
+            if (itemDto.getName() != null) {
+                item.setName(itemDto.getName());
             }
-            if (item.getDescription() == null || item.getDescription().isEmpty()) {
-                throw new ItemNullParametr(String.format("Description not exist - %s", item.getDescription()));
+            if (itemDto.getDescription() != null) {
+                item.setDescription(itemDto.getDescription());
             }
             itemStorage.save(item);
             return ItemMapper.toItemDto(item);
         } else {
-            throw new UserNotFound("User %s not found", userId);
+            throw new UserNotFound(String.format("User by ID: %s - is not Owner of this Item", userId));
         }
     }
 
     @Override
-    public ItemDto put(ItemDto itemDto, long itemId, long userId) throws ItemNotFound, UserNotFound {
-        Optional<Item> optionalItem = itemStorage.findById(itemId);
-        if (optionalItem.isPresent()) {
-            Item item = optionalItem.get();
-            if (item.getOwner() != null && item.getOwner().getId().equals(userId)) {
-                if (itemDto.getAvailable() != null) {
-                    item.setAvailable(itemDto.getAvailable());
-                }
-                if (itemDto.getName() != null) {
-                    item.setName(itemDto.getName());
-                }
-                if (itemDto.getDescription() != null) {
-                    item.setDescription(itemDto.getDescription());
-                }
-                itemStorage.save(item);
-                return ItemMapper.toItemDto(item);
-            } else {
-                throw new UserNotFound("User %s not found", userId);
-            }
-        } else {
-            throw new ItemNotFound("Item %s not found", itemId);
-        }
-    }
-
-    @Override
-    public void delete(long itemId) throws ItemNotFound {
-        if (!itemStorage.findAll().removeIf(item -> item.getId() == itemId)) {
-            throw new ItemNotFound("Item %s not found", itemId);
-        }
+    public void deleteItem(long itemId) {
+        Item item = checkItem(itemId);
+        itemStorage.delete(item);
     }
 
     @Override
@@ -86,37 +81,52 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto findById(long itemId) throws ItemNotFound {
-        Optional<Item> optionalItem = itemStorage.findById(itemId);
-        if (optionalItem.isPresent()) {
-            return ItemMapper.toItemDto(optionalItem.get());
-        } else {
-            throw new ItemNotFound("Item %s not found", itemId);
+    public ItemResponseDto findItemById(long itemId,
+                                        long userId,
+                                        BookingService bookingService,
+                                        CommentService commentService) {
+        Item item = checkItem(itemId);
+        User user = userService.checkUser(userId);
+        if (user.equals(item.getOwner())) {
+            Booking lastBooking = bookingService.getLastBookingByItem(itemId);
+            Booking nextBooking = bookingService.getNextBookingByItem(itemId);
+            return ItemMapper.toItemResponseDto(item, lastBooking, nextBooking, commentService);
         }
+        return ItemMapper.toItemResponseDto(item, null, null, commentService);
     }
 
     @Override
-    public List<ItemDto> findAllByUserId(long userId) throws UserNotFound {
-        Optional<User> optionalUser = userStorage.findById(userId);
-        if (optionalUser.isPresent()) {
-            return itemStorage.findAllByOwnerId(userId).stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        } else {
-            throw new UserNotFound("User %s not found", userId);
-        }
+    public List<ItemResponseDto> findAllItemsByUserId(long userId,
+                                                      BookingService bookingService,
+                                                      CommentService commentService) {
+        User owner = userService.checkUser(userId);
+        List<Item> items = itemStorage.findAllByOwnerIdOrderByIdAsc(owner.getId());
+        return items.stream().map(item -> ItemMapper.toItemResponseDto(
+                        item,
+                        bookingService.getLastBookingByItem(item.getId()),
+                        bookingService.getNextBookingByItem(item.getId()),
+                        commentService))
+                .sorted(Comparator.comparing(ItemResponseDto::getId))
+                .collect(Collectors.toList());
     }
 
-    // TODO не работает
     @Override
-    @Transactional
-    public List<ItemDto> findAllByItemName(String text) {
+    public List<ItemDto> searchItemsByNameAndDescription(String text) {
         if (!text.isEmpty()) {
             text = text.toLowerCase();
-            List<ItemDto> itemDtos = itemStorage.findAllByNameAndDescriptionLowerCase(text, text).stream()
+            return itemStorage.findAllByNameAndDescriptionLowerCase(text, text).stream()
                     .map(ItemMapper::toItemDto).collect(Collectors.toList());
-            return itemDtos;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public Item checkItem(long itemId) throws ItemNotFound {
+        Optional<Item> optionalItem = itemStorage.findById(itemId);
+        if (optionalItem.isPresent()) {
+            return optionalItem.get();
+        } else {
+            throw new ItemNotFound("Item by ID: %s  - not found", itemId);
+        }
     }
 }

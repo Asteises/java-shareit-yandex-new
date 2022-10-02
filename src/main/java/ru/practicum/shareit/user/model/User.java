@@ -10,9 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -29,9 +26,6 @@ public class User {
     @Column(name = "NAME", nullable = false, length = 255)
     private String name;
 
-    @Email
-    @NotNull
-    @NotBlank
     @Column(name = "EMAIL")
     private String email;
 }
