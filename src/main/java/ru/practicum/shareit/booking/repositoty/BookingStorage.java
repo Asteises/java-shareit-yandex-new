@@ -19,8 +19,8 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     @Query(value = "select * from BOOKINGS B " +
             "where B.BOOKER_ID = ?1 " +
             "and (B.STATUS = ?2 or B.STATUS = ?3) " +
-            "order by B.START_DATE desc"
-            , nativeQuery = true)
+            "order by B.START_DATE desc",
+            nativeQuery = true)
     List<Booking> findAllByBookerAndStatusFutureOrderByStartDesc(long bookerId, String status1, String status2);
 
     @Query(value = "select * from BOOKINGS B " +
