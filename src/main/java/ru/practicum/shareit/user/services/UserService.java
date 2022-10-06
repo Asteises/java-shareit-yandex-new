@@ -2,20 +2,26 @@ package ru.practicum.shareit.user.services;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exceptions.UserDtoBadRequest;
 import ru.practicum.shareit.user.exceptions.UserNotFound;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
 @Service
 public interface UserService {
 
-    UserDto save(UserDto userDto);
+    UserDto createUser(UserDto userDto) throws UserDtoBadRequest;
 
-    UserDto put(UserDto userDto, long userId) throws UserNotFound;
+    UserDto updateUser(UserDto userDto, long userId);
 
-    void delete(long userId) throws UserNotFound;
+    void deleteUser(long userId);
 
-    List<UserDto> findAll();
+    List<UserDto> findAllUsers();
 
-    UserDto findById(long userId) throws UserNotFound;
+    UserDto findUserById(long userId);
+
+    User checkUser(long userId) throws UserNotFound;
+
+
 }

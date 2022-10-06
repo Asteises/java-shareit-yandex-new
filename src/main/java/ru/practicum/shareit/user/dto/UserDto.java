@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
 
 @Getter
 @Setter
@@ -13,10 +12,7 @@ import javax.validation.constraints.NotNull;
 public class UserDto {
 
     private long id;
-    @NotNull
-    @NotBlank
     private String name;
-    @NotNull
-    @NotBlank
+    @Email
     private String email;
 }
